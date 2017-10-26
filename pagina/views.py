@@ -5,7 +5,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login as auth_login
 from django.http import HttpRequest
 from django.contrib.auth.models import User
-from pagina.models import Animales, Loteria, Agencia, Sorteo, Ticket, Ticke_item, Horas
+from pagina.models import Animales, Loteria, Agencia, Sorteo, Ticket, Ticke_item, Horas, AnimalGanador
 from django.contrib.auth.models import User
 from django_ajax.decorators import ajax
 from django.contrib.auth.decorators import login_required
@@ -13,7 +13,8 @@ from django.http import JsonResponse
 import secrets
 import json
 from django.core import serializers
-
+from datetime import datetime, timedelta, date
+from django.db.models import Sum
 # Create your views here.
 
 def login(request):
@@ -67,32 +68,31 @@ def lotoanimal (request, loteriaid):
 
 
 @ajax
-def ticket(request):
-    
-        horas = request.POST.getlist('horas[]')
-        todos = json.loads(request.POST.get('animales'))
-        total = sum(todos.values())
-        loteria = request.POST.get('loteria')
-        idlote = request.POST.get('id_loteria')
-        ci = request.POST.get('ci')
-        us = request.user.id
-        loteria = Loteria.objects.get(pk=idlote)
-        agenciar = Agencia.objects.get(usuario_id=us)
-        tokena = secrets.token_hex(16)
-        #Crear ticket general
-        ticket = Ticket (cedula=ci, ida=agenciar, idl=loteria, total=total,token=tokena)
-        ticket.save()
-        idticket = ticket.id_ticket
-        #Crear los  tickets items y los agrego al ticket general
-        for k,v in todos.items():
-            ticketItem = Ticke_item(id_ticket=ticket, id_animal=Animales.objects.get(nombre=k, idl=loteria), monto_apu=v)
-            ticketItem.save()
-        #enlazar las horas con el ticket
-        for h in horas:
-            horat = Horas(ticket=ticket, horas=h )
-            horat.save()
- 
-        return {'horas': horas, 'total': total, 'animales': todos,'loteria': loteria, 'ci': ci, 'agencia': agenciar, 'token': tokena, 'idtk':idticket,}
+def ticket(request): 
+    horas = request.POST.getlist('horas[]')
+    todos = json.loads(request.POST.get('animales'))
+    total = sum(todos.values())
+    loteria = request.POST.get('loteria')
+    idlote = request.POST.get('id_loteria')
+    ci = request.POST.get('ci')
+    us = request.user.id
+    loteria = Loteria.objects.get(pk=idlote)
+    agenciar = Agencia.objects.get(usuario_id=us)
+    tokena = secrets.token_hex(16)
+    #Crear ticket general
+    ticket = Ticket (cedula=ci, ida=agenciar, idl=loteria, total=total,token=tokena)
+    ticket.save()
+    idticket = ticket.id_ticket
+    #Crear los  tickets items y los agrego al ticket general
+    for k,v in todos.items():
+        ticketItem = Ticke_item(id_ticket=ticket, id_animal=Animales.objects.get(nombre=k, idl=loteria), monto_apu=v)
+        ticketItem.save()
+    #enlazar las horas con el ticket
+    for h in horas:
+        horat = Horas(ticket=ticket, horas=h )
+        horat.save()
+
+    return {'horas': horas, 'total': total, 'animales': todos,'loteria': loteria, 'ci': ci, 'agencia': agenciar, 'token': tokena, 'idtk':idticket,}
 
 @ajax
 def search (request):
@@ -111,6 +111,20 @@ def search (request):
         return {'ticketitem': ticketitems,'loteria': loteria, 'ticketb': ticketb,'sorteos': sorteos,'agencia': agencia, 'fecha': fechatk[0]['fields']['fecha'], 'tkbuscado': ticketbuscado}
     else:
         print('no hay ticket')
+
+
+def taquilla (request):
+    hoy = datetime.today()
+    ticketsHoy = Ticket.objects.filter(fecha=hoy).values('id_ticket')
+    ticketDiarios = Ticket.objects.filter(fecha=hoy).count()
+    totalVentas = Ticket.objects.filter(fecha=hoy).aggregate(Sum('total'))
+    tkitemsHoy = Ticke_item.objects.filter(id_ticket__fecha=hoy).values('id_animal','id_ticket')
+    animalesGanadores = AnimalGanador.objects.filter(fecha=hoy).values('animal__id_animal', 'hora')
+   
+    print(tkitemsHoy)
+    contexto = {'tikets_diarios':ticketDiarios, 'totalventas':totalVentas['total__sum'],}
+
+    return render (request, 'taquilla.html', contexto)
 
    
     

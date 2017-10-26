@@ -1,0 +1,52 @@
+{% extends 'base2.html' %}
+
+{% block titulo %}
+<h2>Taquilla</h2>
+{% endblock %}
+
+{% block body %}
+<div class="row">
+	<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 margin-bottom-10">
+	    <div class="dashboard-stat blue">
+	        <div class="visual">
+	            <i class="fa fa-ticket fa-icon-medium"></i>
+	        </div>
+	        <div class="details">
+	            <div class="number"> {{tikets_diarios}} </div>
+	            <div class="desc"> Tickets Vendidos </div>
+	        </div>
+	        <a class="more" href="javascript:;"> Detalles
+	            <i class="m-icon-swapright m-icon-white"></i>
+	        </a>
+	    </div>
+	</div>
+	<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+	    <div class="dashboard-stat green">
+	        <div class="visual">
+	            <i class="fa fa-dollar"></i>
+	        </div>
+	        <div class="details">
+	            <div class="number"> 1,127,390 </div>
+	            <div class="desc"> Tickets Premiados </div>
+	        </div>
+	        <a class="more" href="javascript:;"> View more
+	            <i class="m-icon-swapright m-icon-white"></i>
+	        </a>
+	    </div>
+	</div>
+	<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+	    <div class="dashboard-stat yellow-lemon">
+	        <div class="visual">
+	            <i class="fa fa-bank fa-icon-medium"></i>
+	        </div>
+	        <div class="details">
+	            <div class="number"> Bs. {{totalventas}} </div>
+	            <div class="desc"> Total Ventas </div>
+	        </div>
+	        <a class="more" href="javascript:;"> View more
+	            <i class="m-icon-swapright m-icon-white"></i>
+	        </a>
+	    </div>
+	</div>
+</div>   
+{% endblock %}

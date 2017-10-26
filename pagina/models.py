@@ -37,7 +37,7 @@ class Animales(models.Model):
 	nombre = models.CharField(max_length=20, null=True)
 
 	def __str__(self):
-		return '%s %s %s %s'%(self.nombre, self.imagen, self.numero, self.idl )
+		return '%s %s'%(self.nombre, self.numero,)
 
 
 class Ticket(models.Model):
@@ -74,6 +74,17 @@ class Horas(models.Model):
 	ticket = models.ForeignKey(Ticket, null=True)
 	def __str__(self):
 		return '%s' %(self.horas)
+
+
+class AnimalGanador(models.Model):
+	
+	animal = models.ForeignKey(Animales)
+	hora = models.ForeignKey(Sorteo)
+	fecha = models.DateField(auto_now=False)
+	
+	def __str__(self):
+		return '%s' %(self.hora)
+		
 		
 		
 		

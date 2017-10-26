@@ -20,7 +20,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
-from pagina.views import login, home, lotoanimal, ticket, search
+from pagina.views import login, home, lotoanimal, ticket, search, taquilla
 from django.contrib.auth.views import logout, logout_then_login
 
 urlpatterns = [
@@ -33,7 +33,8 @@ urlpatterns = [
     url(r'^ticket/',login_required(ticket),name='ticket'),
     url(r'^ticketready/', ticket, name='ticketready'),
     url(r'^logout/',logout_then_login,name='logout'),
-    url(r'^search/', search, name='search'),
+    url(r'^search/',login_required(search), name='search'),
+    url(r'^taquilla/',login_required(taquilla), name='taquilla'),
 
 
     ]
