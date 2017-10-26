@@ -1,0 +1,23 @@
+{% extends 'base2.html' %}
+
+{% block titulo %}
+<h2>Seleccionar Loteria</h2>
+{% endblock %}
+
+{% block body %}
+
+<div class="row">
+    {% for i in loterias %}
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <a class="dashboard-stat dashboard-stat-v2 blue" href="/caranimal/{{i.idl}}">
+                    <div class="visual">
+                        <i class="fa fa-money"></i>
+                    </div>
+                    <div class="details">
+                        <div><h3 style="color: white" class="bold text-uppercase">{{i.nombre_lot}}</h3></div>
+                    </div>
+                </a>
+            </div>
+            
+    {% endfor %}                    
+{% endblock %}

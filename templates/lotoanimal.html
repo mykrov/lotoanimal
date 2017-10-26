@@ -1,0 +1,354 @@
+{% extends 'base2.html' %}
+
+
+{% block titulo %}
+	<style>
+	.icheck-inline>label:first-child {
+		margin-left: 15px;
+	}
+	</style>
+	<h2> <i class="fa fa-clock-o"></i> Sorteos</h2>
+	<br>
+		<div class="input-group">
+                <div class="col-md-12">
+					<form action="">
+                    <div class="input-group">
+                        <div class="icheck-inline">
+                        	{% for k in horas %}
+                            <label class="">
+                                <div class="icheckbox_flat-grey" style="position: relative;" value="{{k.hora | time:'h:ia'}}">
+                                	<input type="checkbox" class="icheck" data-checkbox="icheckbox_flat-blue" value="{{k.hora|time:'h:ia'}}" style="position: absolute; opacity: 0;">
+                                	<ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;">
+                                	</ins>
+                                </div>{{k.hora | time:"h:ia"}}
+                            </label>
+                           {% endfor %}
+                       </div>
+                	</div>
+					</form>
+                </div>
+        </div>
+    <br>
+	<h2><i class="fa fa-th"></i> Lista de Animales </h2>
+	<br>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+	<div class="row">
+		<div class="col-sm-12 col-md-8">
+			<div class="row">
+	    {% for i in lista %}
+	            <div class="col-md-2 col-sm-6 col-xs-6">
+	                <div class="">
+	                	<button class="btn blue btn-block text-uppercase" onclick="newrow(num={{i.numero}},nom='{{i.nombre}}')" id="animal_{{i.numero}}">{{i.numero}} - <small>{{i.nombre}}</small></button>
+	                </div>
+	                <div>
+	                	<a class="mx-auto"><img src="/static/imganimals/{{i.numero}}.jpg" class="img-circle img-responsive animalito center-block" style="max-height: 250px; min-height: 90px; margin-top: 1em; margin-bottom: 1em"></a>
+	                </div>
+	                
+	            </div>
+	    {% endfor %}
+	    	</div>
+    	</div>
+    	
+    	<div class="row">
+	    	<div class="col-md-4 col-sm-12 col-xs-12">
+	    		<div class="portlet box green">
+		      		<div class="portlet-title">
+		      			<h3 class="text-center"> <i class="fa fa-ticket"></i> Ticket</h3>
+		      		</div>
+		      		<div class="portlet-body">
+		      			
+			      		<table id="tableticket" class="stripe" cellspacing="0" width="100%">
+						    <thead>
+						        <tr>
+						            <th>Animal</th>
+									<th>sub/baj</th>
+						            <th>Total</th>
+						            
+						        </tr>
+						    </thead>
+						    <tbody>
+						    </tbody>
+						</table>
+					</div>
+					<!-- <input type='hidden' name='input_name' id='input_dicci' value="" />
+					<input type='hidden' name='input_name' id='input_arr' value="" /> -->
+					
+					<button href class="btn btn-primary btn-block" id="imprimir">Generar</button>
+
+				</div>
+	    	</div>
+    	</div>
+   	</div>
+    </div>
+    
+    <!-- Modal -->
+<div id="myModal" class="modal fade in" data-backdrop="static" role="dialog">
+  <div class="modal-dialog modal-sm">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header blue">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title bold" id="ticket_modal"></h4>
+      </div>
+      <div id="caja" class="modal-body">
+      	<div class="row" >
+      		<div class="col-sm-3" >
+      			<h5 class="bold text-left">Agencia:</h5>	
+      		</div>
+      		<div class="col-sm-9" >
+      			<h5 id="tkAgencia" class="text-left"></h5>
+      		</div>
+      	</div>
+      	<div class="row" >
+      		<div class="col-sm-3" >
+      			<h5 class="bold text-left">Loteria:</h5>	
+      		</div>
+      		<div class="col-sm-9" >
+      			<h5 id="tkLoteria"></h5>
+      		</div>
+      	</div>
+		<div class="row" >
+      		<div class="col-sm-3" >
+      			<h5 class="bold text-left">Sorteos:</h5>	
+      		</div>
+      		<div class="row">
+      			<div class="col-sm-12" >
+      				<h5 class="text-center" id="tkSor"></h5>
+      			</div>
+      		</div>
+      		
+      	</div>
+      	<table id="tablemodal" class="table table-condensed table-hover" cellspacing="0" width="100%">
+			<thead>
+				<tr>
+					<th class="bold">Animal</th>
+					<th class="bold">Apuesta</th>
+				</tr>
+			</thead>
+			<tbody id="tablemodalbody">
+			</tbody>
+		</table>
+		<div class="row" >
+      		<div class="col-sm-3" >
+      			<h4 class="bold text-left">Total:</h4>	
+      		</div>
+      		<div class="col-sm-9" >
+      			<h4 id="tkTotal" class="red"></h4>
+      		</div>
+      	</div>
+      	<div class="row" >
+      		<div class="col-sm-12" >
+      			<h5 class="bold text-left">Cod.Seguridad:</h5><h5 id="tkToken"></h5>
+      		</div>	
+      	</div>
+      </div>	
+	       <div class="modal-footer">
+	        <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+	      </div>
+    </div>
+      
+    </div>
+
+  </div>
+
+	
+	<script type="text/javascript">
+
+		 // Variable de la DataTable
+		var u = $('#tableticket').DataTable({"searching": false, "bInfo": false, "bLengthChange": false, "bPaginate": false,fixedHeader: true,
+  		'createdRow': function ( row, data, dataIndex ) {
+      		$(row).attr('id', 'row_'+nom);
+  		}, buttons : ['print'],
+  		'columnDefs': [
+     		{
+        		'targets': 2,
+        		'createdCell':  function (td, cellData, rowData, row, col) {
+           			$(td).attr('id', 'ani_'+num); 
+        		}
+     		}
+  		]
+    },);
+		
+		$(document).ready(function() {
+		});
+
+		// Obtener cookie de la sesion Django para el token
+		function getCookie(name) {
+		    var cookieValue = null;
+		    	if (document.cookie && document.cookie != '') {
+		            var cookies = document.cookie.split(';');
+		          for (var i = 0; i < cookies.length; i++) {
+		               var cookie = jQuery.trim(cookies[i]);
+		          // Does this cookie string begin with the name we want?
+		          if (cookie.substring(0, name.length + 1) == (name + '=')) {
+		            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+		              break;
+		             }
+		          }
+		      }
+		 return cookieValue;
+		}
+
+		var horaSelec = [];
+		var dicci = {};
+
+		function newrow(num,nom){
+			var costomin = {{mini}};
+			var total = 0 + costomin;
+			var animalnom = 'nom'; 
+					u.row.add([
+			        nom,
+			        `<button class="btn btn-icon-only blue" onclick="suma(${num},'${nom}')"><i class="fa fa-plus" aria-hidden="true"></i></button><button class="btn btn-icon-only blue" onclick="resta(${num},'${nom}')"><i class="fa fa-minus" aria-hidden="true"></i></button></button><button class="btn btn-icon-only red" onclick="quitar(${num},'${nom}')"><i class="fa fa-times" aria-hidden="true"></i></button>`,
+			        total,
+
+
+			        ]).draw( false );
+			        $("#animal_"+num).prop('disabled', true);
+			        dicci[nom] = parseInt($('#ani_'+num).text());
+			        console.log(dicci)
+			        
+			    };
+
+		function suma(num,nom){
+			var v = $('#ani_'+num);
+					v.text(parseInt(v.text())+{{mini}});
+					dicci[nom] = parseInt($('#ani_'+num).text());
+					console.log(dicci)
+					
+				};
+
+		function resta(num,nom){
+			var v = $('#ani_'+num);
+				if(parseInt(v.text())>=({{mini}}*2)){
+					$('#ani_'+num).text(parseInt(v.text())-{{mini}});
+					dicci[nom] = parseInt($('#ani_'+num).text());
+					console.log(dicci);
+				} else {
+					$("#animal_"+num).prop('disabled', false);
+					var rows = u
+					.rows( '#row_'+nom )
+    				.remove()
+    				.draw();
+    				delete dicci[nom]
+    				console.log(dicci)
+				}
+			}
+		function quitar (num,nom){
+			$("#animal_"+num).prop('disabled', false);
+					var rows = u
+					.rows( '#row_'+nom )
+    				.remove()
+    				.draw();
+    				delete dicci[nom]
+    				console.log(dicci)
+		}
+					
+		var csrftoken = getCookie("csrftoken");
+
+		$("#busqueda").click(function(b) {
+			b.preventDefault();
+			var loterianame = "{{id_loteria}}"
+				
+			$.ajax({
+				url: '/search/',
+				type: 'POST',
+				data: {csrfmiddlewaretoken : csrftoken, 
+					busquedatk: $("#inputbus").val(),
+					idloteria: loterianame, 
+					}
+			})
+			.done(function(datab) {
+				
+				$("#ticket_modal").text("TICKET BUSCADO: " + datab.content.tkbuscado + " FECHA: "+ datab.content.fecha);
+				$("#tkToken").text(datab.content.ticketb[0]["token"]);
+				$("#tkTotal").text(datab.content.ticketb[0]["total"]);
+				$("#tkAgencia").text(datab.content.agencia);
+				$("#tkLoteria").text(datab.content.loteria);
+
+				
+				$.each(datab.content.sorteos, function(index, val) {
+			    	$("#tkSor").append(val+",");
+			  	});
+				var obj= datab.content.ticketitem
+			  	$.each(datab.content.ticketitem, function(index, value) {
+			  		
+			  		$("#tablemodalbody").append("<tr>" + "<td>" + value.id_animal__nombre + "</td>" + "<td>" + value.monto_apu + "</td>" + "<tr/>");		
+			  	});
+
+			  	$("#myModal").modal();
+			  
+			  	$("#myModal").on("hidden.bs.modal", function() {
+			    	
+			    	$("#tkSor").empty();
+			    	$("#tablemodalbody").empty();
+			  	});
+
+				
+			})
+		});
+
+		$("#imprimir").click(function(e) {
+      		e.preventDefault();
+      		
+      		$(".icheck:checked").each(function() {
+        		horaSelec.push($(this).attr("value"));
+      		});
+      		
+	      	if (horaSelec.length > 0 && Object.keys(dicci).length > 0) {
+		        
+		        var myDict = JSON.stringify(dicci);
+		        var loterianame = "{{loteria}}";
+		        var id_loteria = {{id_loteria}};
+
+		        $.ajax({
+				  url: "/ticket/",
+				  type: "POST",
+				  data: {
+				  csrfmiddlewaretoken: csrftoken,
+				  animales: myDict,
+				  horas: horaSelec,
+				  loteria: loterianame,
+				  id_loteria: id_loteria
+				  }  
+				})
+				.done(function(data) {
+				  $("#ticket_modal").text("TICKET NUMERO: " + data.content.idtk);
+				  $("#tkAgencia").text(data.content.agencia);
+				  $("#tkToken").text(data.content.token);
+				  $("#tkLoteria").text(data.content.loteria);
+				  $("#tkTotal").text(data.content.total);
+				  
+				  $.each(data.content.horas, function(index, val) {
+				    $("#tkSor").append(val + " ");
+				  });
+				  
+				  $.each(data.content.animales, function(index, val) {
+				    $("#tablemodalbody").append("<tr>" + "<td>" + index + "</td>" + "<td>" + val + "</td>" + "<tr/>");
+				  });
+				  $("#myModal").modal();
+				  
+				  $("#myModal").on("hidden.bs.modal", function() {
+				    horaSelec = [];
+				    $("#tkSor").empty();
+				    $("#tablemodalbody").empty();
+				    $("#ticket_modal").empty();
+					$("#tkAgencia").empty();
+					$("#tkLoteria").empty();
+					$("#tkTotal").empty();
+				  });
+				})
+				
+			} else {
+				
+				$("#tkSor").empty();
+	            $("#tablemodalbody").empty();
+	            horaSelec = [];
+	            toastr.error("un sorteo y un animal","Debe seleccionar al menos:" ,{timeOut: 5000});
+			}
+			});
+	</script>
+{% endblock %}

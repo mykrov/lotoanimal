@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>
+        Prueba de DataTables
+    </title>
+</head>
+<body>
+
+   <button class="btn blue btn-block text-uppercase" onclick="newrow(num,nom)"> nueva row</button>
+
+
+    <table id="tableticket" class="stripe" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th>Animal</th>
+                        <th>Valor</th>
+                        <th>Minimo</th>
+                        <th>total</th>
+                        <th>+</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+</body>
+
+<script type="text/javascript">
+        var num=2;
+        var nom=caballo;
+        var min=200;
+        var u = $('#tableticket').DataTable({"searching": false, "bInfo": false, "bLengthChange": false, "bPaginate": false,fixedHeader: true,});
+        $(document).ready(function() {
+        });
+        
+        function newrow (num,nom) {
+            var costo = {{mini}};
+            var multiplo = 2;
+            var total = 0;
+                    u.row.add([
+                    nom,
+                    num,
+                    costo,
+                    multiplo*costo,
+                        
+
+                    ]).draw( false );      
+                };
+    </script>
+</html>
