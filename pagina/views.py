@@ -15,6 +15,7 @@ import json
 from django.core import serializers
 from datetime import datetime, timedelta, date
 from django.db.models import Sum
+from django.db import connection
 # Create your views here.
 
 def login(request):
@@ -120,8 +121,12 @@ def taquilla (request):
     totalVentas = Ticket.objects.filter(fecha=hoy).aggregate(Sum('total'))
     tkitemsHoy = Ticke_item.objects.filter(id_ticket__fecha=hoy).values('id_animal','id_ticket')
     animalesGanadores = AnimalGanador.objects.filter(fecha=hoy).values('animal__id_animal', 'hora')
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT COUNT(distinct ticket_id) FROM pagina_ticke_item inner join pagina_animalganador ON (pagina_ticke_item.id_animal_id = pagina_animalGanador.animal_id) inner join pagina_ticket ON (pagina_ticket.id_ticket = pagina_ticke_item.id_ticket_id) inner join pagina_horas ON (pagina_horas.ticket_id = pagina_ticket.id_ticket) WHERE pagina_ticket.fecha = CURDATE()")
+        row = cursor.fetchall()
    
-    print(tkitemsHoy)
+    print(row)
     contexto = {'tikets_diarios':ticketDiarios, 'totalventas':totalVentas['total__sum'],}
 
     return render (request, 'taquilla.html', contexto)
