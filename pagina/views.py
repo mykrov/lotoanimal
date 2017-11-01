@@ -89,11 +89,15 @@ def ticket(request):
         ticketItem = Ticke_item(id_ticket=ticket, id_animal=Animales.objects.get(nombre=k, idl=loteria), monto_apu=v)
         ticketItem.save()
     #enlazar las horas con el ticket
+    horasAm=[]
     for h in horas:
-        horat = Horas(ticket=ticket, horas=h )
+        timeObj = datetime.strptime(h,'%H:%M')
+        timeFix = datetime.strftime(timeObj,'%H:%M:%S')
+        horat = Horas(ticket=ticket, horas=Sorteo.objects.get(hora=timeFix))
         horat.save()
+        horasAm.append(datetime.strftime(timeObj,'%I:%M%p'))
 
-    return {'horas': horas, 'total': total, 'animales': todos,'loteria': loteria, 'ci': ci, 'agencia': agenciar, 'token': tokena, 'idtk':idticket,}
+    return {'horas': horasAm, 'total': total, 'animales': todos,'loteria': loteria, 'ci': ci, 'agencia': agenciar, 'token': tokena, 'idtk':idticket,}
 
 @ajax
 def search (request):
@@ -105,14 +109,20 @@ def search (request):
     agencia = Agencia.objects.get(usuario_id=us)
     idlote = request.POST.get('idloteria')
     loteria = Loteria.objects.get(pk=idlote)
-    sorteos = Horas.objects.filter(ticket=ticketbuscado)
+    sorteos = Horas.objects.filter(ticket_id=ticketbuscado)
+    print(sorteos)
+    sorteosAm = []
+    # for h in sorteos:
+    #     # sorteoObj = datetime.strptime(h,'%H:%M:%S')
+    #     sorteosAm.append(h)
+    #     print (sorteosAm)
     if ticketb.count() > 0:
         ticketitems = Ticke_item.objects.filter (id_ticket=ticketbuscado).values('id_animal__nombre', 'monto_apu')
         print('si hay tickets')
         return {'ticketitem': ticketitems,'loteria': loteria, 'ticketb': ticketb,'sorteos': sorteos,'agencia': agencia, 'fecha': fechatk[0]['fields']['fecha'], 'tkbuscado': ticketbuscado}
     else:
         print('no hay ticket')
-
+    
 
 def taquilla (request):
     hoy = datetime.today()

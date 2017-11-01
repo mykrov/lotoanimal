@@ -70,7 +70,7 @@ class Sorteo (models.Model):
 		return '%s' %(self.hora)
 
 class Horas(models.Model):
-	horas = models.TimeField()
+	horas = models.ForeignKey(Sorteo, null=True)
 	ticket = models.ForeignKey(Ticket, null=True)
 	def __str__(self):
 		return '%s' %(self.horas)
