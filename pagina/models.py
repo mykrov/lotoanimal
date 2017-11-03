@@ -72,6 +72,7 @@ class Sorteo (models.Model):
 class Horas(models.Model):
 	horas = models.ForeignKey(Sorteo, null=True)
 	ticket = models.ForeignKey(Ticket, null=True)
+	
 	def __str__(self):
 		return '%s' %(self.horas)
 

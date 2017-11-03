@@ -133,13 +133,21 @@ def taquilla (request):
     animalesGanadores = AnimalGanador.objects.filter(fecha=hoy).values('animal__id_animal', 'hora')
 
     with connection.cursor() as cursor:
-        cursor.execute("SELECT COUNT(distinct ticket_id) FROM pagina_ticke_item inner join pagina_animalganador ON (pagina_ticke_item.id_animal_id = pagina_animalGanador.animal_id) inner join pagina_ticket ON (pagina_ticket.id_ticket = pagina_ticke_item.id_ticket_id) inner join pagina_horas ON (pagina_horas.ticket_id = pagina_ticket.id_ticket) WHERE pagina_ticket.fecha = CURDATE()")
+        cursor.execute("SELECT COUNT(distinct ticket_id) FROM pagina_ticke_item inner join pagina_animalganador ON (pagina_ticke_item.id_animal_id = pagina_animalGanador.animal_id AND pagina_animalganador.fecha = CURDATE()) inner join pagina_ticket ON (pagina_ticket.id_ticket = pagina_ticke_item.id_ticket_id) inner join pagina_horas ON (pagina_horas.ticket_id = pagina_ticket.id_ticket AND pagina_horas.horas_id=pagina_animalganador.hora_id) WHERE pagina_ticket.fecha = CURDATE()")
         row = cursor.fetchall()
    
     print(row)
-    contexto = {'tikets_diarios':ticketDiarios, 'totalventas':totalVentas['total__sum'],}
+    contexto = {'tikets_diarios':ticketDiarios, 'totalventas':totalVentas['total__sum'],'totalTkPremiado':row[0][0]}
 
     return render (request, 'taquilla.html', contexto)
+
+@ajax
+def ticketpre (request):
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM pagina_ticke_item inner join pagina_animalganador ON (pagina_ticke_item.id_animal_id = pagina_animalGanador.animal_id AND pagina_animalganador.fecha = CURDATE()) inner join pagina_ticket ON (pagina_ticket.id_ticket = pagina_ticke_item.id_ticket_id) inner join pagina_horas ON (pagina_horas.ticket_id = pagina_ticket.id_ticket AND pagina_horas.horas_id=pagina_animalganador.hora_id) WHERE pagina_ticket.fecha = CURDATE()")
+        itemsPre = cursor.fetchall()
+        print (itemsPre)
+    return {}
 
    
     
