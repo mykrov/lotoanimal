@@ -16,6 +16,7 @@ from django.core import serializers
 from datetime import datetime, timedelta, date
 from django.db.models import Sum
 from django.db import connection
+from collections import namedtuple
 # Create your views here.
 
 def login(request):
@@ -43,7 +44,7 @@ def login(request):
     return render(request, 'login.html', locals())
 
 
-@login_required(login_url="/login/")
+# @login_required(login_url="/login/")
 def home (request):
     us = request.user.id
     agencia_aso = Agencia.objects.filter(usuario=us)
@@ -144,10 +145,18 @@ def taquilla (request):
 @ajax
 def ticketpre (request):
     with connection.cursor() as cursor:
-        cursor.execute("SELECT * FROM pagina_ticke_item inner join pagina_animalganador ON (pagina_ticke_item.id_animal_id = pagina_animalGanador.animal_id AND pagina_animalganador.fecha = CURDATE()) inner join pagina_ticket ON (pagina_ticket.id_ticket = pagina_ticke_item.id_ticket_id) inner join pagina_horas ON (pagina_horas.ticket_id = pagina_ticket.id_ticket AND pagina_horas.horas_id=pagina_animalganador.hora_id) WHERE pagina_ticket.fecha = CURDATE()")
-        itemsPre = cursor.fetchall()
-        print (itemsPre)
-    return {}
+        cursor.execute("SELECT id_ticket_id,id_animal_id,monto_apu FROM pagina_ticke_item inner join pagina_animalganador ON (pagina_ticke_item.id_animal_id = pagina_animalGanador.animal_id AND pagina_animalganador.fecha = CURDATE()) inner join pagina_ticket ON (pagina_ticket.id_ticket = pagina_ticke_item.id_ticket_id) inner join pagina_horas ON (pagina_horas.ticket_id = pagina_ticket.id_ticket AND pagina_horas.horas_id=pagina_animalganador.hora_id) WHERE pagina_ticket.fecha = CURDATE()")
+        row = cursor.fetchall()
+        print (row)
+        lista = list(({"idTicket": t[0],"animalid":t[1],"valor":t[2]}) for t in row)
+        print(lista)
+        if len(row) > 0:
+            return {'items':lista}
+        else:
+            print ('No hay Tickets Premiados')
+            return {'itemsPre':(0)}
+            
+ 
 
    
     

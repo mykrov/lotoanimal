@@ -55,9 +55,27 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
-                <h4 class="modal-title">Titulo</h4>
+                <h4 class="modal-title text-center bold blue">Tickets Premiados</h4>
             </div>
-            <div class="modal-body"> Modal cuerpo </div>
+            <div class="modal-body"> 
+				<div class="">
+					<div class="row">
+						<div class='col-md-8'>
+							<table id="tablemodal" class="table table-condensed table-hover" cellspacing="0" width="100%">
+							<thead>
+								<tr>
+									<th class="bold">Animal</th>
+									<th class="bold">Ticket</th>
+									<th class="bold">Apuesta</th>
+								</tr>
+							</thead>
+							<tbody id="tablemodalbodypre">
+							</tbody>
+						</table>
+						</div>
+					</div>
+				</div>
+             </div>
             <div class="modal-footer">
                 <button type="button" class="btn dark btn-outline" data-dismiss="modal">Cerrar</button>
                 <button type="button" class="btn green">Guardar</button>
@@ -66,10 +84,82 @@
         <!-- /.modal-content -->
     </div>
     <!-- /.modal-dialog -->
-</div>  
+</div> 
+    <!-- Modal -->
+<div id="myModal" class="modal fade in" data-backdrop="static" role="dialog">
+  <div class="modal-dialog modal-sm">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header blue">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title bold" id="ticket_modal"></h4>
+      </div>
+      <div id="caja" class="modal-body">
+      	<div class="row" >
+      		<div class="col-sm-3" >
+      			<h5 class="bold text-left">Agencia:</h5>	
+      		</div>
+      		<div class="col-sm-9" >
+      			<h5 id="tkAgencia" class="text-left"></h5>
+      		</div>
+      	</div>
+      	<div class="row" >
+      		<div class="col-sm-3" >
+      			<h5 class="bold text-left">Loteria:</h5>	
+      		</div>
+      		<div class="col-sm-9" >
+      			<h5 id="tkLoteria"></h5>
+      		</div>
+      	</div>
+		<div class="row" >
+      		<div class="col-sm-3" >
+      			<h5 class="bold text-left">Sorteos:</h5>	
+      		</div>
+      		<div class="row">
+      			<div class="col-sm-12" >
+      				<h5 class="text-center" id="tkSor"></h5>
+      			</div>
+      		</div>
+      		
+      	</div>
+      	<table id="tablemodal" class="table table-condensed table-hover" cellspacing="0" width="100%">
+			<thead>
+				<tr>
+					<th class="bold">Animal</th>
+					<th class="bold">Apuesta</th>
+				</tr>
+			</thead>
+			<tbody id="tablemodalbody">
+			</tbody>
+		</table>
+		<div class="row" >
+      		<div class="col-sm-3" >
+      			<h4 class="bold text-left">Total:</h4>	
+      		</div>
+      		<div class="col-sm-9" >
+      			<h4 id="tkTotal" class="red"></h4>
+      		</div>
+      	</div>
+      	<div class="row" >
+      		<div class="col-sm-12" >
+      			<h5 class="bold text-left">Cod.Seguridad:</h5><h5 id="tkToken"></h5>
+      		</div>	
+      	</div>
+      </div>	
+	       <div class="modal-footer">
+	        <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+	      </div>
+    </div>
+      
+    </div>
+
+  </div>
+
 <script type="text/javascript">
+	var csrftoken = getCookie("csrftoken");
 		$(document).ready(function() {
-			var csrftoken = getCookie("csrftoken");
+			
 
 			$('#tkpremiados').click(function(tk){
 				tk.preventDefault();
@@ -78,11 +168,64 @@
 					type: 'POST',
 					data: {csrfmiddlewaretoken : csrftoken,},
 				})
-				.done(function(data) {
-					console.log("success");
+				.done(function(datap) {
+
+					console.log(datap.content.items)
+
+					$.each(datap.content.items, function(index, value) {
+						$("#tablemodalbodypre").append("<tr>" + "<td>" + value.animalid + "</td>" + "<td>" + value.idTicket + "</td>" + "<td>" + value.valor + "</td>" +"</tr>");
+						});
+					$("#large").on("hidden.bs.modal", function() {
+			    		$("#tablemodalbodypre").empty();
+			  	})
+
+					
 				})
 			})
 		
 	});
+
+			$("#busqueda").click(function(b) {
+			b.preventDefault();
+			var loterianame = "4"
+				
+			$.ajax({
+				url: '/search/',
+				type: 'POST',
+				data: {csrfmiddlewaretoken : csrftoken, 
+					busquedatk: $("#inputbus").val(),
+					idloteria: loterianame, 
+					}
+			})
+			.done(function(datab) {
+				
+				$("#ticket_modal").text("TICKET BUSCADO: " + datab.content.tkbuscado + " FECHA: "+ datab.content.fecha);
+				$("#tkToken").text(datab.content.ticketb[0]["token"]);
+				$("#tkTotal").text(datab.content.ticketb[0]["total"]);
+				$("#tkAgencia").text(datab.content.agencia);
+				$("#tkLoteria").text(datab.content.loteria);
+
+				console.log(datab.content.sorteos)
+				$.each(datab.content.sorteos, function(index, val) {
+			    	$("#tkSor").append(moment(val,["HH:mm:ss"]).format("h:mm.A, "));
+			  	});
+				var obj= datab.content.ticketitem
+			  	$.each(datab.content.ticketitem, function(index, value) {
+			  		
+			  		$("#tablemodalbody").append("<tr>" + "<td>" + value.id_animal__nombre + "</td>" + "<td>" + value.monto_apu + "</td>" + "<tr/>");		
+			  	});
+
+			  	$("#myModal").modal();
+			  
+			  	$("#myModal").on("hidden.bs.modal", function() {
+			    	
+			    	$("#tkSor").empty();
+			    	$("#tablemodalbody").empty();
+			  	});
+
+				
+			})
+		});
+
 </script> 
 {% endblock %}
