@@ -41,7 +41,7 @@
 	    {% for i in lista %}
 	            <div class="col-md-2 col-sm-6 col-xs-6">
 	                <div class="">
-	                	<button class="btn blue btn-block text-uppercase" onclick="newrow(num={{i.numero}},nom='{{i.nombre}}')" id="animal_{{i.numero}}">{{i.numero}} - <small>{{i.nombre}}</small></button>
+	                	<button class="btn blue btn-block text-uppercase" onclick="newrow(num='{{i.numero}}',nom='{{i.nombre}}')" id="animal_{{i.numero}}">{{i.numero}} - <small>{{i.nombre}}</small></button>
 	                </div>
 	                <div>
 	                	<a class="mx-auto"><img src="/static/imganimals/{{i.numero}}.jpg" class="img-circle img-responsive animalito center-block" style="max-height: 250px; min-height: 90px; margin-top: 1em; margin-bottom: 1em"></a>
@@ -177,21 +177,21 @@
 		});
 
 		// Obtener cookie de la sesion Django para el token
-		// function getCookie(name) {
-		//     var cookieValue = null;
-		//     	if (document.cookie && document.cookie != '') {
-		//             var cookies = document.cookie.split(';');
-		//           for (var i = 0; i < cookies.length; i++) {
-		//                var cookie = jQuery.trim(cookies[i]);
-		//           // Does this cookie string begin with the name we want?
-		//           if (cookie.substring(0, name.length + 1) == (name + '=')) {
-		//             cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-		//               break;
-		//              }
-		//           }
-		//       }
-		//  return cookieValue;
-		// }
+		function getCookie(name) {
+		    var cookieValue = null;
+		    	if (document.cookie && document.cookie != '') {
+		            var cookies = document.cookie.split(';');
+		          for (var i = 0; i < cookies.length; i++) {
+		               var cookie = jQuery.trim(cookies[i]);
+		          // Does this cookie string begin with the name we want?
+		          if (cookie.substring(0, name.length + 1) == (name + '=')) {
+		            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+		              break;
+		             }
+		          }
+		      }
+		 return cookieValue;
+		}
 
 		var horaSelec = [];
 		var dicci = {};
@@ -202,7 +202,7 @@
 			var animalnom = 'nom'; 
 					u.row.add([
 			        nom,
-			        `<button class="btn btn-icon-only blue" onclick="suma(${num},'${nom}')"><i class="fa fa-plus" aria-hidden="true"></i></button><button class="btn btn-icon-only blue" onclick="resta(${num},'${nom}')"><i class="fa fa-minus" aria-hidden="true"></i></button></button><button class="btn btn-icon-only red" onclick="quitar(${num},'${nom}')"><i class="fa fa-times" aria-hidden="true"></i></button>`,
+			        `<button class="btn btn-icon-only blue" onclick="suma('${num}','${nom}')"><i class="fa fa-plus" aria-hidden="true"></i></button><button class="btn btn-icon-only blue" onclick="resta('${num}','${nom}')"><i class="fa fa-minus" aria-hidden="true"></i></button></button><button class="btn btn-icon-only red" onclick="quitar('${num}','${nom}')"><i class="fa fa-times" aria-hidden="true"></i></button>`,
 			        total,
 
 
