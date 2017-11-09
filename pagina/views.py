@@ -161,20 +161,30 @@ def ticketpre (request):
 
 
 def pdftk (request):
-
+    ticketnum = 331
+    contenido = {'titulo': 'Animalitos',}
+    serializeFecha = serializers.serialize("json", Ticket.objects.filter(id_ticket=ticketnum), fields=('fecha', 'token','total','ida','idl'))
+    fechat = json.loads(serializeFecha)
+    ticketitems = Ticke_item.objects.filter(id_ticket=ticketnum).values()
+    sorteos = Horas.objects.filter(ticket_id=ticketnum)
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename=hello.pdf'
     p = canvas.Canvas(response, pagesize=(5*cm,20*cm))
     p.setFont("Times-Roman", 11)
-    # p.drawString(141, 810, "|") 
-   
-    p.drawString(5 ,60, ".:Animalitos Loteria:.")
-    p.drawString(5 ,50, "==================")
-    p.drawString(5 ,40, "Fecha:")
-    p.drawString(5 ,30, "Sorteos:")
-    p.drawString(5 ,20, "__________________")
-    p.drawString(5 ,10, "Animal - - - - Apuesta")
-    p.drawString(5, 2, "Codigo:")
+    serializeSorteo = serializers.serialize("json",Horas.objects.filter(ticket_id=ticketnum))
+    print(serializeSorteo)
+    p.drawString(0.5*cm ,19.5*cm, ".:Animalitos Loteria:.")
+    p.drawString(0.5*cm ,19.1*cm, "==================")
+    p.drawString(0.5*cm ,18.8*cm, "Fecha:")
+    p.drawString(0.5*cm ,18.5*cm, "Sorteos:")
+    p.drawString(0.5*cm ,18.2*cm, "__________________")
+    p.drawString(0.5*cm ,17.7*cm, "Animal - - - - Apuesta")
+    for k in sorteos:
+        h=0.5
+        p.drawString(0.5*cm, 17.4*cm,""+ str(k) +"," )
+        h=h+0.5
+
+    p.drawString(0.5*cm, 16*cm, "Codigo:")
     p.showPage()
     p.save()
     return response

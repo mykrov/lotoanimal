@@ -81,7 +81,6 @@
     <!-- Modal -->
 <div id="myModal" class="modal fade in" data-backdrop="static" role="dialog">
   <div class="modal-dialog modal-sm">
-
     <!-- Modal content-->
     <div class="modal-content">
       <div class="modal-header blue">
@@ -114,7 +113,6 @@
       				<h5 class="text-center" id="tkSor"></h5>
       			</div>
       		</div>
-      		
       	</div>
       	<table id="tablemodal" class="table table-condensed table-hover" cellspacing="0" width="100%">
 			<thead>
@@ -142,10 +140,8 @@
       </div>	
       <div class="editor"></div>
 	       <div class="modal-footer">
-	        <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-	      </div>
-	      <div class="modal-footer" >
-	        <button type="button" class="btn btn-alert" id="imprimirpdf">Imprimir</button>
+	       	<button type="button" class="btn btn-circle blue-chambray" id="imprimirpdf">Imprimir</button>
+	        <button type="button" class="btn btn-circle btn-danger" data-dismiss="modal">Cerrar</button>
 	      </div>
     </div>
       
@@ -348,25 +344,34 @@
 	            toastr.error("un sorteo y un animal","Debe seleccionar al menos:" ,{timeOut: 5000});
 			}
 			});
-		var doc = new jsPDF({
+		
+
+			
+		
+		
+		$('#imprimirpdf').click(function () {
+			var doc = new jsPDF({
 			orientation: 'p',
   			unit: 'cm',
-  			format: [5,20 ]});
-			// doc.text(1, 1, 'This is a test')
-		var specialElementHandlers = {
-    		'#editor': function (element, renderer) {
-        	return true;
-    		}
-		};
+  			format: [5,15]});  
+    		doc.setFontSize(9)
+   //  		doc.text($("#ticket_modal").text(), 0.2, 0.5);
+   //  		doc.text($("#tkAgencia").text(),0.3,1);
+			// doc.text($("#tkLoteria").text(),0.3,1.5);
 
-		$('#imprimirpdf').click(function () {   
-    		doc.fromHTML(
-    			$('#myModal').html(), 0.2, 0.5, {
-        		'width': 4.5,
-            	'elementHandlers': specialElementHandlers
-    		});
-    		doc.save('sample-file.pdf');
-		});
+			source = $('#myModal')[0];
+			margins = {top:0.5, bottom: 0.5, left: 0.5, width: 4};
+			doc.fromHTML(
+				source,
+				margins.left,
+				margins.top,{ // y coord
+        			'width': margins.width, // max width of content on PDF
+        			
+        		},
+
+        		function (dispose) {
+        			doc.save('asdasd.pdf');}, margins);
+        		});
 
 	</script>
 
