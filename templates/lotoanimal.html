@@ -146,8 +146,12 @@
       		</div>	
       	</div>
       </div>	
+      <div class="editor"></div>
 	       <div class="modal-footer">
 	        <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+	      </div>
+	      <div class="modal-footer" >
+	        <button type="button" class="btn btn-alert" id="imprimirpdf">Imprimir</button>
 	      </div>
     </div>
       
@@ -350,5 +354,26 @@
 	            toastr.error("un sorteo y un animal","Debe seleccionar al menos:" ,{timeOut: 5000});
 			}
 			});
+		var doc = new jsPDF({
+			orientation: 'p',
+  			unit: 'cm',
+  			format: [5,20 ]});
+			// doc.text(1, 1, 'This is a test')
+		var specialElementHandlers = {
+    		'#editor': function (element, renderer) {
+        	return true;
+    		}
+		};
+
+		$('#imprimirpdf').click(function () {   
+    		doc.fromHTML(
+    			$('#myModal').html(), 0.2, 0.5, {
+        		'width': 4.5,
+            	'elementHandlers': specialElementHandlers
+    		});
+    		doc.save('sample-file.pdf');
+		});
+
 	</script>
+
 {% endblock %}
