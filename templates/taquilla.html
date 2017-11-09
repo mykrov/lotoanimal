@@ -12,7 +12,7 @@
 	            <i class="fa fa-ticket fa-icon-medium"></i>
 	        </div>
 	        <div class="details">
-	            <div class="number"> {{tikets_diarios}} </div>
+	            <div class="number"><span data-counter="counterup" data-value="{{tikets_diarios}}"></span> </div>
 	            <div class="desc"> Tickets Vendidos </div>
 	        </div>
 	        <a class="more" href="javascript:;"> Detalles
@@ -26,7 +26,7 @@
 	            <i class="fa fa-dollar"></i>
 	        </div>
 	        <div class="details">
-	            <div class="number"> {{totalTkPremiado}} </div>
+	            <div class="number"> <span data-counter="counterup" data-value="{{totalTkPremiado}}"></span></div>
 	            <div class="desc"> Tickets Premiados </div>
 	        </div>
 	        <a class="btn more" data-toggle="modal" href="#large" id="tkpremiados"> Detalles
@@ -35,12 +35,12 @@
 	    </div>
 	</div>
 	<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-	    <div class="dashboard-stat yellow-lemon">
+	    <div class="dashboard-stat red">
 	        <div class="visual">
 	            <i class="fa fa-bank fa-icon-medium"></i>
 	        </div>
 	        <div class="details">
-	            <div class="number"> Bs. {{totalventas}} </div>
+	            <div class="number">Bs.<span data-counter="counterup" data-value="{{totalventas}}"></span></div>
 	            <div class="desc"> Total Ventas </div>
 	        </div>
 	        <a class="more" href="javascript:;"> Detalles
@@ -77,8 +77,7 @@
 				</div>
              </div>
             <div class="modal-footer">
-                <button type="button" class="btn dark btn-outline" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn green">Guardar</button>
+                <button type="button" class="btn green btn-outline" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
         <!-- /.modal-content -->
@@ -159,6 +158,8 @@
 <script type="text/javascript">
 	var csrftoken = getCookie("csrftoken");
 		$(document).ready(function() {
+
+			$('.counter').counterUp();
 			
 
 			$('#tkpremiados').click(function(tk){

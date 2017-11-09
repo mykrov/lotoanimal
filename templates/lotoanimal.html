@@ -41,17 +41,15 @@
 	    {% for i in lista %}
 	            <div class="col-md-2 col-sm-6 col-xs-6">
 	                <div class="">
-	                	<button class="btn blue btn-block text-uppercase" onclick="newrow(num={{i.numero}},nom='{{i.nombre}}')" id="animal_{{i.numero}}">{{i.numero}} - <small>{{i.nombre}}</small></button>
+	                	<button class="btn blue btn-block text-uppercase" onclick="newrow(num='{{i.numero}}',nom='{{i.nombre}}')" id="animal_{{i.numero}}">{{i.numero}} - <small>{{i.nombre}}</small></button>
 	                </div>
 	                <div>
 	                	<a class="mx-auto"><img src="/static/imganimals/{{i.numero}}.jpg" class="img-circle img-responsive animalito center-block" style="max-height: 250px; min-height: 90px; margin-top: 1em; margin-bottom: 1em"></a>
 	                </div>
-	                
 	            </div>
 	    {% endfor %}
 	    	</div>
     	</div>
-    	
     	<div class="row">
 	    	<div class="col-md-4 col-sm-12 col-xs-12">
 	    		<div class="portlet box green">
@@ -59,14 +57,12 @@
 		      			<h3 class="text-center"> <i class="fa fa-ticket"></i> Ticket</h3>
 		      		</div>
 		      		<div class="portlet-body">
-		      			
 			      		<table id="tableticket" class="stripe" cellspacing="0" width="100%">
 						    <thead>
 						        <tr>
 						            <th>Animal</th>
 									<th>sub/baj</th>
 						            <th>Total</th>
-						            
 						        </tr>
 						    </thead>
 						    <tbody>
@@ -75,9 +71,7 @@
 					</div>
 					<!-- <input type='hidden' name='input_name' id='input_dicci' value="" />
 					<input type='hidden' name='input_name' id='input_arr' value="" /> -->
-					
 					<button href class="btn btn-primary btn-block" id="imprimir">Generar</button>
-
 				</div>
 	    	</div>
     	</div>
@@ -202,7 +196,7 @@
 			var animalnom = 'nom'; 
 					u.row.add([
 			        nom,
-			        `<button class="btn btn-icon-only blue" onclick="suma(${num},'${nom}')"><i class="fa fa-plus" aria-hidden="true"></i></button><button class="btn btn-icon-only blue" onclick="resta(${num},'${nom}')"><i class="fa fa-minus" aria-hidden="true"></i></button></button><button class="btn btn-icon-only red" onclick="quitar(${num},'${nom}')"><i class="fa fa-times" aria-hidden="true"></i></button>`,
+			        `<button class="btn btn-icon-only blue" onclick="suma('${num}','${nom}')"><i class="fa fa-plus" aria-hidden="true"></i></button><button class="btn btn-icon-only blue" onclick="resta('${num}','${nom}')"><i class="fa fa-minus" aria-hidden="true"></i></button></button><button class="btn btn-icon-only red" onclick="quitar('${num}','${nom}')"><i class="fa fa-times" aria-hidden="true"></i></button>`,
 			        total,
 
 

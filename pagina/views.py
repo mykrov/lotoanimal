@@ -17,6 +17,9 @@ from datetime import datetime, timedelta, date
 from django.db.models import Sum
 from django.db import connection
 from collections import namedtuple
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import cm
+from django.http import HttpResponse
 # Create your views here.
 
 def login(request):
@@ -155,6 +158,31 @@ def ticketpre (request):
         else:
             print ('No hay Tickets Premiados')
             return {'itemsPre':(0)}
+
+
+def pdftk (request):
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename=hello.pdf'
+    p = canvas.Canvas(response, pagesize=(5*cm,20*cm))
+    p.setFont("Times-Roman", 11)
+    # p.drawString(141, 810, "|") 
+   
+    p.drawString(5 ,60, ".:Animalitos Loteria:.")
+    p.drawString(5 ,50, "==================")
+    p.drawString(5 ,40, "Fecha:")
+    p.drawString(5 ,30, "Sorteos:")
+    p.drawString(5 ,20, "__________________")
+    p.drawString(5 ,10, "Animal - - - - Apuesta")
+    p.drawString(5, 2, "Codigo:")
+    p.showPage()
+    p.save()
+    return response
+
+
+
+
+
             
  
 
