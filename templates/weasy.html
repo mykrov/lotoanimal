@@ -1,0 +1,38 @@
+{% block content %}
+<style type="text/css">    
+	@page {
+	    size: 5cm 20cm;
+	    margin: 0.5cm 0.5cm 0.5cm 0.5cm;
+	}
+</style>
+
+<div>
+<h2 align="center">Loteria Animalitos</h2>
+Ticket: #{{numero}}<br>
+Soteos:<br>
+{% for i in sor %}
+	{{i.horas|time:"h:i A"}},
+{% endfor %}<br>	
+Fecha: {{fecha}}<br>
+_________________________
+<table>
+<thead>
+	<tr>
+		<th class="bold">Animal</th>
+		<th class="bold">Apuesta</th>
+	</tr>
+</thead>
+<tbody id="tablemodalbody">
+{% for item in items %}
+	<tr class="center"> 
+		<td align="center">{{item.id_animal__nombre}}</td><td align="center">{{item.monto_apu}}</td>
+	</tr>
+{% endfor %}
+</tbody>
+</table>
+_________________________
+Codigo: <br>
+<small>{{token}}</small><br>
+
+</div>
+{% endblock %}

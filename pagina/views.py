@@ -11,6 +11,7 @@ from django_ajax.decorators import ajax
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 import secrets
+from django.conf import settings
 import json
 from django.core import serializers
 from datetime import datetime, timedelta, date
@@ -20,6 +21,8 @@ from collections import namedtuple
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm
 from django.http import HttpResponse
+from easy_pdf.views import PDFTemplateView 
+from easy_pdf.rendering import render_to_pdf
 # Create your views here.
 
 def login(request):
@@ -190,6 +193,28 @@ def pdftk (request):
     return response
 
 
+class HelloPDFView(PDFTemplateView):
+    template_name = 'weasy.html'
+    base_url = 'file://' + settings.STATIC_ROOT
+    download_filename = 'hello.pdf'
+    
+    def get_context_data(self, **kwargs):
+        ticketnum = 331
+        sor = Horas.objects.filter(ticket_id=ticketnum)
+        serializeFecha = serializers.serialize("json", Ticket.objects.filter(id_ticket=ticketnum), fields=('fecha', 'token','total','ida','idl'))
+        fechat = json.loads(serializeFecha)
+        ticketitems = Ticke_item.objects.filter (id_ticket=ticketnum).values('id_animal__nombre', 'monto_apu')
+        print (fechat)
+        return super(HelloPDFView, self).get_context_data(
+            pagesize='A4',
+            title='Hi there!',
+            sor = sor,
+            numero = ticketnum,
+            fecha=fechat[0]['fields']['fecha'],
+            token=fechat[0]['fields']['token'],
+            items=ticketitems,
+            **kwargs
+        )
 
 
 

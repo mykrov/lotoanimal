@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'pagina',
     'django_ajax',
+    'easy_pdf',
 ]
 
 MIDDLEWARE = [
