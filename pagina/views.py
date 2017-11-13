@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, HttpResponseRedirect
+from django.shortcuts import render, redirect, HttpResponseRedirect, get_object_or_404
 from pagina.forms import LoginForm
 from django.contrib.auth import authenticate,views
 from django.contrib.auth.forms import AuthenticationForm
@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 import secrets
 from django.conf import settings
-import json
+import json, time
 from django.core import serializers
 from datetime import datetime, timedelta, date
 from django.db.models import Sum
@@ -54,8 +54,7 @@ def login(request):
 def home (request):
     us = request.user.id
     agencia_aso = Agencia.objects.filter(usuario=us)
-    print(us)
-    print(agencia_aso)
+    
     loterias = Loteria.objects.filter(agencia=agencia_aso).values('idl','nombre_lot')
 
     return render (request, 'index.html', {'loterias': loterias})
@@ -117,7 +116,7 @@ def search (request):
     idlote = request.POST.get('idloteria')
     loteria = Loteria.objects.get(pk=idlote)
     sorteos = Horas.objects.filter(ticket_id=ticketbuscado)
-    print(sorteos)
+    
     sorteosAm = []
     # for h in sorteos:
     #     # sorteoObj = datetime.strptime(h,'%H:%M:%S')
@@ -135,7 +134,7 @@ def taquilla (request):
     hoy = datetime.today()
     ticketsHoy = Ticket.objects.filter(fecha=hoy).values('id_ticket')
     ticketDiarios = Ticket.objects.filter(fecha=hoy).count()
-    totalVentas = Ticket.objects.filter(fecha=hoy).aggregate(Sum('total'))
+    totalVentas = Ticket.objects.filter(fecha=hoy).aggregate(Sum('total')) or 0
     tkitemsHoy = Ticke_item.objects.filter(id_ticket__fecha=hoy).values('id_animal','id_ticket')
     animalesGanadores = AnimalGanador.objects.filter(fecha=hoy).values('animal__id_animal', 'hora')
 
@@ -143,7 +142,7 @@ def taquilla (request):
         cursor.execute("SELECT COUNT(distinct ticket_id) FROM pagina_ticke_item inner join pagina_animalganador ON (pagina_ticke_item.id_animal_id = pagina_animalGanador.animal_id AND pagina_animalganador.fecha = CURDATE()) inner join pagina_ticket ON (pagina_ticket.id_ticket = pagina_ticke_item.id_ticket_id) inner join pagina_horas ON (pagina_horas.ticket_id = pagina_ticket.id_ticket AND pagina_horas.horas_id=pagina_animalganador.hora_id) WHERE pagina_ticket.fecha = CURDATE()")
         row = cursor.fetchall()
    
-    print(row)
+    
     contexto = {'tikets_diarios':ticketDiarios, 'totalventas':totalVentas['total__sum'],'totalTkPremiado':row[0][0]}
 
     return render (request, 'taquilla.html', contexto)
@@ -153,9 +152,9 @@ def ticketpre (request):
     with connection.cursor() as cursor:
         cursor.execute("SELECT id_ticket_id,id_animal_id,monto_apu FROM pagina_ticke_item inner join pagina_animalganador ON (pagina_ticke_item.id_animal_id = pagina_animalGanador.animal_id AND pagina_animalganador.fecha = CURDATE()) inner join pagina_ticket ON (pagina_ticket.id_ticket = pagina_ticke_item.id_ticket_id) inner join pagina_horas ON (pagina_horas.ticket_id = pagina_ticket.id_ticket AND pagina_horas.horas_id=pagina_animalganador.hora_id) WHERE pagina_ticket.fecha = CURDATE()")
         row = cursor.fetchall()
-        print (row)
+        
         lista = list(({"idTicket": t[0],"animalid":t[1],"valor":t[2]}) for t in row)
-        print(lista)
+        
         if len(row) > 0:
             return {'items':lista}
         else:
@@ -175,7 +174,7 @@ def pdftk (request):
     p = canvas.Canvas(response, pagesize=(5*cm,20*cm))
     p.setFont("Times-Roman", 11)
     serializeSorteo = serializers.serialize("json",Horas.objects.filter(ticket_id=ticketnum))
-    print(serializeSorteo)
+ 
     p.drawString(0.5*cm ,19.5*cm, ".:Animalitos Loteria:.")
     p.drawString(0.5*cm ,19.1*cm, "==================")
     p.drawString(0.5*cm ,18.8*cm, "Fecha:")
@@ -194,23 +193,41 @@ def pdftk (request):
 
 
 class HelloPDFView(PDFTemplateView):
+    
     template_name = 'weasy.html'
     base_url = 'file://' + settings.STATIC_ROOT
     download_filename = 'hello.pdf'
     
+    
+    # def get_queryset(self, **kwargs):
+    #     code = self.args[0]
+        
+        # return Ticket.objects.filter(token=code)
     def get_context_data(self, **kwargs):
+        # code = request.POST.get('token')
+        print('se ejecuta la vista PDF')
+        
         ticketnum = 331
-        sor = Horas.objects.filter(ticket_id=ticketnum)
-        serializeFecha = serializers.serialize("json", Ticket.objects.filter(id_ticket=ticketnum), fields=('fecha', 'token','total','ida','idl'))
+        
+        token = self.args[0]
+        sor = Horas.objects.filter(ticket_id__token=token)
+        print (token)
+        sorformated= []
+        # for i in sor:
+        #     print(time.strftime("%I:%M %r"),time.gmtime(i))
+        #     # sorformateid.append(time.strftime("%I:%M %r"))
+        #     print(i)
+
+        serializeFecha = serializers.serialize("json", Ticket.objects.filter(token=token), fields=('fecha', 'token','total','ida','idl',))
         fechat = json.loads(serializeFecha)
-        ticketitems = Ticke_item.objects.filter (id_ticket=ticketnum).values('id_animal__nombre', 'monto_apu')
+        ticketitems = Ticke_item.objects.filter (id_ticket__token=token).values('id_animal__nombre', 'monto_apu')
         print (fechat)
         return super(HelloPDFView, self).get_context_data(
             pagesize='A4',
             title='Hi there!',
             sor = sor,
-            numero = ticketnum,
-            fecha=fechat[0]['fields']['fecha'],
+            numero = fechat[0]['pk'],
+            fecha = fechat[0]['fields']['fecha'],
             token=fechat[0]['fields']['token'],
             items=ticketitems,
             **kwargs

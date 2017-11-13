@@ -7,7 +7,7 @@
 		margin-left: 15px;
 	}
 	</style>
-	<h2> <i class="fa fa-clock-o"></i> Sorteos</h2>
+	<h2> <i class="fa fa-clock-o"></i>Sorteos</h2>
 	<br>
 		<div class="input-group">
                 <div class="col-md-12">
@@ -140,7 +140,7 @@
       </div>	
       <div class="editor"></div>
 	       <div class="modal-footer">
-	       	<button type="button" class="btn btn-circle blue-chambray" id="imprimirpdf">Imprimir</button>
+	       	<button type="button" class="btn btn-circle blue-chambray" id="imprimirpdf"><a class="pdflink" href="">Imprimir</a></button>
 	        <button type="button" class="btn btn-circle btn-danger" data-dismiss="modal">Cerrar</button>
 	      </div>
     </div>
@@ -279,6 +279,7 @@
 			    	
 			    	$("#tkSor").empty();
 			    	$("#tablemodalbody").empty();
+			    	$(".pdflink").attr("href", "")
 			  	});
 
 				
@@ -315,6 +316,7 @@
 				  $("#tkToken").text(data.content.token);
 				  $("#tkLoteria").text(data.content.loteria);
 				  $("#tkTotal").text(data.content.total);
+				  $(".pdflink").attr("href","{{request.get_host}}/doc/"+data.content.token)
 				  
 				  $.each(data.content.horas, function(index, val) {
 				    $("#tkSor").append(val + " ");
@@ -333,6 +335,7 @@
 					$("#tkAgencia").empty();
 					$("#tkLoteria").empty();
 					$("#tkTotal").empty();
+					$(".pdflink").attr("href", "")
 				  });
 				})
 				
@@ -345,33 +348,14 @@
 			}
 			});
 		
+		// $("#imprimirpdf").click(function(event) {
+		// 	/* Act on the event */
+		// 	event.preventDefault();
+		// 	var cod = $("#tkToken").text()
 
+		// 	window.open(window.location.hostname+"/doc/"+cod)
 			
-		
-		
-		$('#imprimirpdf').click(function () {
-			var doc = new jsPDF({
-			orientation: 'p',
-  			unit: 'cm',
-  			format: [5,15]});  
-    		doc.setFontSize(9)
-   //  		doc.text($("#ticket_modal").text(), 0.2, 0.5);
-   //  		doc.text($("#tkAgencia").text(),0.3,1);
-			// doc.text($("#tkLoteria").text(),0.3,1.5);
-
-			source = $('#myModal')[0];
-			margins = {top:0.5, bottom: 0.5, left: 0.5, width: 4};
-			doc.fromHTML(
-				source,
-				margins.left,
-				margins.top,{ // y coord
-        			'width': margins.width, // max width of content on PDF
-        			
-        		},
-
-        		function (dispose) {
-        			doc.save('asdasd.pdf');}, margins);
-        		});
+		// });
 
 	</script>
 

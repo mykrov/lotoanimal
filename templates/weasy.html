@@ -4,6 +4,10 @@
 	    size: 5cm 20cm;
 	    margin: 0.5cm 0.5cm 0.5cm 0.5cm;
 	}
+	#tablebody{
+		border-color: black;
+		border: 1em;
+	}
 </style>
 
 <div>
@@ -11,7 +15,7 @@
 Ticket: #{{numero}}<br>
 Soteos:<br>
 {% for i in sor %}
-	{{i.horas|time:"h:i A"}},
+	{{i.horas}},
 {% endfor %}<br>	
 Fecha: {{fecha}}<br>
 _________________________
@@ -22,10 +26,11 @@ _________________________
 		<th class="bold">Apuesta</th>
 	</tr>
 </thead>
-<tbody id="tablemodalbody">
+<tbody id="tablebody">
 {% for item in items %}
 	<tr class="center"> 
-		<td align="center">{{item.id_animal__nombre}}</td><td align="center">{{item.monto_apu}}</td>
+		<td align="center">{{item.id_animal__nombre}}</td>
+		<td align="center">{{item.monto_apu}}</td>
 	</tr>
 {% endfor %}
 </tbody>

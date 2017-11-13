@@ -37,9 +37,7 @@ urlpatterns = [
     url(r'^taquilla/',login_required(taquilla), name='taquilla'),
     url(r'^ticketpre/',login_required(ticketpre), name='ticketpre'),
     url(r'^pdftk/',login_required(pdftk), name='pdftk'),
-    url(r'^doc/', HelloPDFView.as_view()),
-
-
+    url(r'^doc/(\w+)/$', HelloPDFView.as_view()),
     ]
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
