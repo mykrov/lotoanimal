@@ -125,10 +125,13 @@ def taquilla (request):
     hoy = datetime.today()
     ticketsHoy = Ticket.objects.filter(fecha=hoy).values('id_ticket')
     ticketDiarios = Ticket.objects.filter(fecha=hoy).count()
+
     if ticketDiarios == 0:
         totalVentas = {'total__sum': 0}
+        gananciaBank = 0
     else:
         totalVentas = Ticket.objects.filter(fecha=hoy).aggregate(Sum('total'))
+        gananciaBank = totalVentas['total__sum']*10/100
     
     tkitemsHoy = Ticke_item.objects.filter(id_ticket__fecha=hoy).values('id_animal','id_ticket')
     animalesGanadores = AnimalGanador.objects.filter(fecha=hoy).values('animal__id_animal', 'hora')
@@ -137,7 +140,7 @@ def taquilla (request):
         cursor.execute("SELECT COUNT(distinct ticket_id) FROM pagina_ticke_item inner join pagina_animalganador ON (pagina_ticke_item.id_animal_id = pagina_animalGanador.animal_id AND pagina_animalganador.fecha = CURDATE()) inner join pagina_ticket ON (pagina_ticket.id_ticket = pagina_ticke_item.id_ticket_id) inner join pagina_horas ON (pagina_horas.ticket_id = pagina_ticket.id_ticket AND pagina_horas.horas_id=pagina_animalganador.hora_id) WHERE pagina_ticket.fecha = CURDATE()")
         row = cursor.fetchall()
    
-    contexto = {'tikets_diarios':ticketDiarios, 'totalventas':totalVentas['total__sum'],'totalTkPremiado':row[0][0]}
+    contexto = {'tikets_diarios':ticketDiarios,'bankGanacia':gananciaBank, 'totalventas':totalVentas['total__sum'],'totalTkPremiado':row[0][0]}
     
     return render (request, 'taquilla.html', contexto)
 
