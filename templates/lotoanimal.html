@@ -148,8 +148,6 @@
     </div>
 
   </div>
-
-	
 	<script type="text/javascript">
 
 		 // Variable de la DataTable
@@ -198,8 +196,6 @@
 			        nom,
 			        `<button class="btn btn-icon-only blue" onclick="suma('${num}','${nom}')"><i class="fa fa-plus" aria-hidden="true"></i></button><button class="btn btn-icon-only blue" onclick="resta('${num}','${nom}')"><i class="fa fa-minus" aria-hidden="true"></i></button></button><button class="btn btn-icon-only red" onclick="quitar('${num}','${nom}')"><i class="fa fa-times" aria-hidden="true"></i></button>`,
 			        total,
-
-
 			        ]).draw( false );
 			        $("#animal_"+num).prop('disabled', true);
 			        dicci[nom] = parseInt($('#ani_'+num).text());
@@ -280,9 +276,7 @@
 			    	$("#tkSor").empty();
 			    	$("#tablemodalbody").empty();
 			    	$(".pdflink").attr("href", "")
-			  	});
-
-				
+			  	});	
 			})
 		});
 
@@ -347,16 +341,6 @@
 	            toastr.error("un sorteo y un animal","Debe seleccionar al menos:" ,{timeOut: 5000});
 			}
 			});
-		
-		// $("#imprimirpdf").click(function(event) {
-		// 	/* Act on the event */
-		// 	event.preventDefault();
-		// 	var cod = $("#tkToken").text()
-
-		// 	window.open(window.location.hostname+"/doc/"+cod)
-			
-		// });
-
 	</script>
 
 {% endblock %}

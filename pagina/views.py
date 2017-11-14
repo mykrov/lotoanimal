@@ -127,10 +127,9 @@ def taquilla (request):
     ticketDiarios = Ticket.objects.filter(fecha=hoy).count()
     if ticketDiarios == 0:
         totalVentas = {'total__sum': 0}
-        print ('ss') 
     else:
         totalVentas = Ticket.objects.filter(fecha=hoy).aggregate(Sum('total'))
-    print (totalVentas['total__sum'])
+    
     tkitemsHoy = Ticke_item.objects.filter(id_ticket__fecha=hoy).values('id_animal','id_ticket')
     animalesGanadores = AnimalGanador.objects.filter(fecha=hoy).values('animal__id_animal', 'hora')
 
