@@ -11,19 +11,13 @@ class Agencia (models.Model):
 
 	def __str__(self):
 		return '%s %s' %(self.nombrea, self.ida)
-
-# class Perfil(models.Model):
-#     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
-#     agencia = models.ForeignKey(Agencia)
-
-    # def __str__(self):
-    # 	return '%s %s' %(self.usuario, self.agencia)
-    
+  
 
 class Loteria(models.Model):
 	idl = models.AutoField(primary_key=True)
 	nombre_lot = models.CharField(max_length=52)
 	agencia = models.ForeignKey(Agencia, default=1)
+	bankporcentaje = models.IntegerField(default=10)
 
 	def __str__(self):
 		return '%s %s' %(self.nombre_lot,self.idl)
@@ -85,7 +79,3 @@ class AnimalGanador(models.Model):
 	
 	def __str__(self):
 		return '%s' %(self.hora)
-		
-		
-		
-		

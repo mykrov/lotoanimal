@@ -224,13 +224,3 @@ class HelloPDFView(PDFTemplateView):
             largotk=largotk,
             **kwargs
         )
-
-
-
-            
- 
-
-   
-    
-    
-    
