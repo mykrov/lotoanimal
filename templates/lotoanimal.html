@@ -71,7 +71,7 @@
 					</div>
 					<!-- <input type='hidden' name='input_name' id='input_dicci' value="" />
 					<input type='hidden' name='input_name' id='input_arr' value="" /> -->
-					<button href class="btn btn-primary btn-block" id="imprimir">Generar</button>
+					<button href class="btn btn-primary btn-block" id="imprimir"><i class="fa fa-check"></i> Generar</button>
 				</div>
 	    	</div>
     	</div>
@@ -140,8 +140,8 @@
       </div>	
       <div class="editor"></div>
 	       <div class="modal-footer">
-	       	<button type="button" class="btn btn-circle blue-chambray" id="imprimirpdf"><a class="pdflink" href="">Imprimir</a></button>
-	        <button type="button" class="btn btn-circle btn-danger" data-dismiss="modal">Cerrar</button>
+	       	<a class="pdflink" href="" target="_blank"><button type="button" class="btn btn-circle blue-chambray" id="imprimirpdf"><i class="fa fa-print"></i> Imprimir</button></a>
+	        <button type="button" class="btn btn-circle btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Cerrar</button>
 	      </div>
     </div>
       
@@ -316,7 +316,7 @@
 				  $("#tkToken").text(data.content.token);
 				  $("#tkLoteria").text(data.content.loteria);
 				  $("#tkTotal").text(data.content.total);
-				  $(".pdflink").attr("href","{{request.get_host}}/doc/"+data.content.token)
+				  $(".pdflink").attr("href","/doc/"+data.content.token)
 				  
 				  $.each(data.content.horas, function(index, val) {
 				    $("#tkSor").append(val + " ");

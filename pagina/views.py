@@ -3,16 +3,14 @@ from pagina.forms import LoginForm
 from django.contrib.auth import authenticate,views
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login as auth_login
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.contrib.auth.models import User
 from pagina.models import Animales, Loteria, Agencia, Sorteo, Ticket, Ticke_item, Horas, AnimalGanador
 from django.contrib.auth.models import User
 from django_ajax.decorators import ajax
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-import secrets
-from django.conf import settings
-import json, time
+import secrets,json, time
+from django.conf import settings 
 from django.core import serializers
 from datetime import datetime, timedelta, date
 from django.db.models import Sum
@@ -20,7 +18,6 @@ from django.db import connection
 from collections import namedtuple
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm
-from django.http import HttpResponse
 from easy_pdf.views import PDFTemplateView 
 from easy_pdf.rendering import render_to_pdf
 # Create your views here.
@@ -50,11 +47,9 @@ def login(request):
     return render(request, 'login.html', locals())
 
 
-# @login_required(login_url="/login/")
 def home (request):
     us = request.user.id
     agencia_aso = Agencia.objects.filter(usuario=us)
-    
     loterias = Loteria.objects.filter(agencia=agencia_aso).values('idl','nombre_lot')
 
     return render (request, 'index.html', {'loterias': loterias})
@@ -116,12 +111,8 @@ def search (request):
     idlote = request.POST.get('idloteria')
     loteria = Loteria.objects.get(pk=idlote)
     sorteos = Horas.objects.filter(ticket_id=ticketbuscado)
-    
     sorteosAm = []
-    # for h in sorteos:
-    #     # sorteoObj = datetime.strptime(h,'%H:%M:%S')
-    #     sorteosAm.append(h)
-    #     print (sorteosAm)
+    
     if ticketb.count() > 0:
         ticketitems = Ticke_item.objects.filter (id_ticket=ticketbuscado).values('id_animal__nombre', 'monto_apu')
         print('si hay tickets')
@@ -134,7 +125,12 @@ def taquilla (request):
     hoy = datetime.today()
     ticketsHoy = Ticket.objects.filter(fecha=hoy).values('id_ticket')
     ticketDiarios = Ticket.objects.filter(fecha=hoy).count()
-    totalVentas = Ticket.objects.filter(fecha=hoy).aggregate(Sum('total')) or 0
+    if ticketDiarios == 0:
+        totalVentas = {'total__sum': 0}
+        print ('ss') 
+    else:
+        totalVentas = Ticket.objects.filter(fecha=hoy).aggregate(Sum('total'))
+    print (totalVentas['total__sum'])
     tkitemsHoy = Ticke_item.objects.filter(id_ticket__fecha=hoy).values('id_animal','id_ticket')
     animalesGanadores = AnimalGanador.objects.filter(fecha=hoy).values('animal__id_animal', 'hora')
 
@@ -142,9 +138,8 @@ def taquilla (request):
         cursor.execute("SELECT COUNT(distinct ticket_id) FROM pagina_ticke_item inner join pagina_animalganador ON (pagina_ticke_item.id_animal_id = pagina_animalGanador.animal_id AND pagina_animalganador.fecha = CURDATE()) inner join pagina_ticket ON (pagina_ticket.id_ticket = pagina_ticke_item.id_ticket_id) inner join pagina_horas ON (pagina_horas.ticket_id = pagina_ticket.id_ticket AND pagina_horas.horas_id=pagina_animalganador.hora_id) WHERE pagina_ticket.fecha = CURDATE()")
         row = cursor.fetchall()
    
-    
     contexto = {'tikets_diarios':ticketDiarios, 'totalventas':totalVentas['total__sum'],'totalTkPremiado':row[0][0]}
-
+    
     return render (request, 'taquilla.html', contexto)
 
 @ajax
@@ -198,30 +193,27 @@ class HelloPDFView(PDFTemplateView):
     base_url = 'file://' + settings.STATIC_ROOT
     download_filename = 'hello.pdf'
     
-    
-    # def get_queryset(self, **kwargs):
-    #     code = self.args[0]
-        
-        # return Ticket.objects.filter(token=code)
     def get_context_data(self, **kwargs):
         # code = request.POST.get('token')
         print('se ejecuta la vista PDF')
-        
-        ticketnum = 331
-        
         token = self.args[0]
         sor = Horas.objects.filter(ticket_id__token=token)
-        print (token)
         sorformated= []
-        # for i in sor:
-        #     print(time.strftime("%I:%M %r"),time.gmtime(i))
-        #     # sorformateid.append(time.strftime("%I:%M %r"))
-        #     print(i)
-
         serializeFecha = serializers.serialize("json", Ticket.objects.filter(token=token), fields=('fecha', 'token','total','ida','idl',))
         fechat = json.loads(serializeFecha)
         ticketitems = Ticke_item.objects.filter (id_ticket__token=token).values('id_animal__nombre', 'monto_apu')
-        print (fechat)
+        #Largo del PDF Ticket
+        largotk=len(ticketitems)*0.4+6
+        if len(sor) <= 3:
+            largotk = largotk+0.3
+        elif len(sor)<=6:
+            largotk = largotk+0.6
+        elif len(sor)<=9:
+            largotk = largotk+0.9
+        elif len(sor)<=12:
+            largotk = largotk+1.2
+
+
         return super(HelloPDFView, self).get_context_data(
             pagesize='A4',
             title='Hi there!',
@@ -230,6 +222,7 @@ class HelloPDFView(PDFTemplateView):
             fecha = fechat[0]['fields']['fecha'],
             token=fechat[0]['fields']['token'],
             items=ticketitems,
+            largotk=largotk,
             **kwargs
         )
 
